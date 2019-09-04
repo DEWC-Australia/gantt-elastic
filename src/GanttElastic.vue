@@ -114,6 +114,7 @@ function getOptions(userOptions) {
     maxRows: 20, //*
     maxHeight: 0, //*
     chart: {
+      display: true, //*
       grid: {
         horizontal: {
           gap: 6 //*
@@ -685,7 +686,7 @@ const GanttElastic = {
      */
     syncScrollTop() {
       if (
-        this.state.refs.taskListItems &&
+        this.state.refs.taskListItems && this.state.refs.chartGraph &&
         this.state.refs.chartGraph.scrollTop !== this.state.refs.taskListItems.scrollTop
       ) {
         this.state.options.scroll.top = this.state.refs.taskListItems.scrollTop = this.state.refs.chartScrollContainerVertical.scrollTop = this.state.refs.chartGraph.scrollTop;
@@ -697,6 +698,7 @@ const GanttElastic = {
      */
     calculateTaskListColumnsDimensions() {
       let final = 0;
+      
       let percentage = 0;
       for (let column of this.state.options.taskList.columns) {
         if (column.expander) {
@@ -710,6 +712,15 @@ const GanttElastic = {
         final += column.finalWidth;
         column.height = this.getTaskHeight() - this.style['grid-line-horizontal']['stroke-width'];
       }
+
+      if(!this.state.options.chart.display){
+        const fullWidth = this.$root.$el.clientWidth - 15;
+        for (let column of this.state.options.taskList.columns){
+          column.finalWidth = (column.finalWidth / final) * fullWidth;
+        }
+        final = fullWidth;
+      }
+
       this.state.options.taskList.widthFromPercentage = percentage;
       this.state.options.taskList.finalWidth = final;
     },
@@ -943,7 +954,8 @@ const GanttElastic = {
       if (this.state.options.scroll.chart.left === left && this.state.options.scroll.chart.top === top) {
         return;
       }
-      const chartContainerWidth = this.state.refs.chartContainer.clientWidth;
+      const chartContainerWidth = (this.state.refs.chartContainer)? this.state.refs.chartContainer.clientWidth: 0;
+      const chartclientWidth = (this.state.refs.chart)? this.state.refs.chart.clientWidth: 0;
       this.state.options.scroll.chart.left = left;
       this.state.options.scroll.chart.right = left + chartContainerWidth;
       this.state.options.scroll.chart.percent = (left / this.state.options.times.totalViewDurationPx) * 100;
@@ -952,7 +964,7 @@ const GanttElastic = {
       this.state.options.scroll.chart.timeCenter = this.pixelOffsetXToTime(left + chartContainerWidth / 2);
       this.state.options.scroll.chart.dateTime.left = dayjs(this.state.options.scroll.chart.time).valueOf();
       this.state.options.scroll.chart.dateTime.right = dayjs(
-        this.pixelOffsetXToTime(left + this.state.refs.chart.clientWidth)
+        this.pixelOffsetXToTime(left + chartclientWidth)
       ).valueOf();
       this.scrollTo(left, top);
     },
@@ -980,14 +992,20 @@ const GanttElastic = {
      */
     scrollTo(left = null, top = null) {
       if (left !== null) {
-        this.state.refs.chartCalendarContainer.scrollLeft = left;
-        this.state.refs.chartGraphContainer.scrollLeft = left;
+        if(this.state.refs.chartCalendarContainer){
+          this.state.refs.chartCalendarContainer.scrollLeft = left;
+        }
+        if(this.state.refs.chartGraphContainer){
+          this.state.refs.chartGraphContainer.scrollLeft = left;
+        }
         this.state.refs.chartScrollContainerHorizontal.scrollLeft = left;
         this.state.options.scroll.left = left;
       }
       if (top !== null) {
         this.state.refs.chartScrollContainerVertical.scrollTop = top;
-        this.state.refs.chartGraph.scrollTop = top;
+        if(this.state.refs.chartGraph){
+          this.state.refs.chartGraph.scrollTop = top;
+        }
         this.state.refs.taskListItems.scrollTop = top;
         this.state.options.scroll.top = top;
         this.syncScrollTop();

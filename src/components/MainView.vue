@@ -80,6 +80,7 @@
       }"
       @scroll="onHorizontalScroll"
       ref="chartScrollContainerHorizontal"
+      v-show="root.state.options.chart.display"
     >
       <div
         class="gantt-elastic__chart-scroll--horizontal"

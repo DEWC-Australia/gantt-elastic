@@ -7,7 +7,9 @@
  */
 -->
 <template>
-  <div class="gantt-elastic__chart" :style="{ ...root.style['chart'] }" ref="chart">
+  <div class="gantt-elastic__chart" :style="{ ...root.style['chart'] }" ref="chart"
+    v-show="root.state.options.chart.display"
+  >
     <div
       class="gantt-elastic__chart-calendar-container"
       ref="chartCalendarContainer"
@@ -103,7 +105,6 @@ export default {
     this.root.state.refs.chartGraph = this.$refs.chartGraph;
     this.root.state.refs.chartGraphSvg = this.$refs.chartGraphSvg;
   },
-
   computed: {
     /**
      * Get view box
