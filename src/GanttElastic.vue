@@ -714,11 +714,14 @@ const GanttElastic = {
       }
 
       if(!this.state.options.chart.display){
-        const fullWidth = this.$root.$el.clientWidth - 15;
-        for (let column of this.state.options.taskList.columns){
-          column.finalWidth = (column.finalWidth / final) * fullWidth;
-        }
-        final = fullWidth;
+		var rootEl = document.getElementsByClassName("gantt-elastic");
+		if(rootEl.length > 0){
+			const fullWidth = rootEl[0].clientWidth - 15;
+			for (let column of this.state.options.taskList.columns){
+			column.finalWidth = (column.finalWidth / final) * fullWidth;
+			}
+			final = fullWidth;
+		}
       }
 
       this.state.options.taskList.widthFromPercentage = percentage;
